@@ -2,6 +2,13 @@
 
 trait Helper
 {
+    public function pr(mixed $data, bool|int $exit = 0)
+    {
+        echo "<pre>";
+        print_r($data);
+        if ($exit) exit;
+        echo "</pre>";
+    }
     public function getQueryParams(string $key = "")
     {
         if (isset($_GET[$key])) return $_GET[$key];
@@ -22,7 +29,7 @@ trait Helper
             "message" => "",
             "data"    => [],
         ];
-        $data = array_merge($format,$data);
+        $data = array_merge($format, $data);
 
         echo json_encode($data);
         exit;

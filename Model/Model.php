@@ -2,6 +2,7 @@
 
 class Model
 {
+    use Helper;
     protected $connection = null;
     public function __construct()
     {
@@ -14,8 +15,33 @@ class Model
             throw new Exception($e->getMessage());
         }
     }
+    protected function selectData(string $table, array|string $from, array $condition = [])
+    {
+        if (empty($from)) return;
 
-    protected function isUserExist(string $email, string $phone)
+        if (is_array($from)) {
+            $from = implode(",", $from);
+        } else {
+            return;
+        }
+
+        $query = " SELECT {$from} FROM {$table} ";
+        $length = count($condition);
+        $i = 1;
+        if ($length > 0) {
+            $query .= " WHERE ";
+        }
+        $cond = "AND";
+        foreach ($condition as $k => $v) {
+            if ($length == $i) {
+                $cond = "";
+            }
+            $query .= " {$k} = '{$v}' {$cond} ";
+            $i++;
+        }
+        return $this->connection->query($query);
+    }
+    protected function isUserExist(string $email, string $phone): int
     {
         $query = "SELECT id FROM mod_admin WHERE vEmail = '{$email}' OR vPhone = '{$phone}' LIMIT 1";
         $response =  $this->connection->query($query);
