@@ -55,4 +55,16 @@ class Model
             . "VALUES ('" . implode("', '", $val) . "')";
         return $this->connection->query($sql);
     }
+
+    protected function pgPrice(int $rid): int|float
+    {
+        $query = "SELECT vPGRent as price FROM pg_rooms WHERE id = '{$rid}' LIMIT 1";
+        $response = $this->connection->query($query);
+        if ($response->num_rows > 0) {
+            $response = $response->fetch_object();
+            return (float) $response->price;
+        } else {
+            return 0;
+        }
+    }
 }

@@ -93,4 +93,28 @@ class Controller extends Model
         }
         $this->sendOutput(['message' => "required parameter empty"], 429);
     }
+    public function bookingAction()
+    {
+        $postData = $this->getPostQueryParams();
+        if ($postData['no_pop'] < 1) $this->sendOutput(['message' => "People are required"], 500);
+        $postParam = [
+            'uid' => "iUserId",
+            'rid' => "iRoomId",
+            'no_pop' => "iNoPop"
+        ];
+        $prepareData = [];
+        foreach ($postData as $k => $val) {
+            $prepareData[$postParam[$k]] = $val;
+        }
+        $roomId = $postData['rid'];
+        $roomPrice = $this->pgPrice($roomId);
+        if ($roomPrice < 1) $this->sendOutput(['message' => "Something went wrong"], 500);
+        $prepareData['fRoomPrice']  = $roomPrice;
+        $prepareData['fTotalPrice'] = $roomPrice * $postData['no_pop'];
+        $insert_id = $this->createData('booking', $prepareData);
+        if ($insert_id and $insert_id > 0) {
+            $this->sendOutput(['message' => "Booking Successfull"], 200);
+        }
+        $this->sendOutput(['message' => "Something went wrong"], 500);
+    }
 }
